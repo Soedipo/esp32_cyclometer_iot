@@ -43,6 +43,9 @@ FirebaseAuth auth;
 FirebaseConfig config;
 
 unsigned long sendDataPrevMillis = 0;
+unsigned long sendDataPrevMillis1 = 0;
+unsigned long sendDataPrevMillis2 = 0;
+unsigned long sendDataPrevMillis3 = 0;
 int count = 0;
 bool signupOK = false;
 
@@ -130,7 +133,7 @@ unsigned long endTime = 0;
 unsigned long startTime = 0;
 unsigned long revolutionStartTime = 0;
 unsigned long currentTimeCount = 0;
-unsigned long elapsedTime;
+unsigned long elapsedTime = 0;
 int timeSeconds = 0;
 int timeMinutes = 0;
 int timeHours = 0;
@@ -261,15 +264,15 @@ void loop()
   speed = 0;
 
   startTime = millis();
-  timeCount();
 
   attachInterrupt(digitalPinToInterrupt(HALL), interruptFunction, RISING);
   delay(1000);
   detachInterrupt(2);
 
-  diameter = firebaseGetFloat(diameterDumpFirebaseDirectory);
-  firebaseSetFloat(diameterFirebaseDirectory, diameter);
+  diameter = firebaseGetFloat(diameterFirebaseDirectory);
+  currentTimeCount = firebaseGetFloat(timeFirebaseDirectory);
   Serial.println(diameter);
+  Serial.println(currentTimeCount);
 
   wheelCircumference = PI * diameter * 0.00001; // CALCULATE THE WHEEL CIRCUMFERENCE
 
@@ -286,29 +289,10 @@ void loop()
       maxSpeed = speed;
     }
   }
-  averageSpeed = distance * 0.0036 / currentTimeCount;
+  averageSpeed = distance * 3.6 / currentTimeCount;
 
-  // convert to string
-  String outMsg = String("RPM :") + rpm;
-  String speedMsg = String("SPEED :") + speed;
-  String timeMsg = String("time :") + elapsedTime;
-  String disMsg = String("distance :") + distance;
-  String avgMsg = String("averageSpeed :") + averageSpeed;
-  String rpmString = String(rpm);               // Create a character array of 10 characters
   String speedString = speed + String(" Km/H"); // Create a character array of 10 characters
   String disString = distance + String(" Km");  // Create a character array of 10 characters
-  // Convert float to a string:
-  // dtostrf(rpm, 6, 0, string); // (<variable>,<amount of digits we are going to use>,<amount of decimal digits>,<string name>)
-
-  // OUTPUT to serial
-  // Serial.println(outMsg);
-  // Serial.println(speedMsg);
-  // Serial.println(timeMsg);
-  // Serial.println(disMsg);
-  // Serial.println(currentRevolution);
-  // // Serial.println(timeDisplay);
-  // Serial.println(avgMsg);
-  // Serial.println(currentTimeCount);
 
   // OUPUT to OLED display
   display.clearDisplay();               // Clear the display so we can refresh.
@@ -323,15 +307,23 @@ void loop()
   display.display();          // Print everything we set previously
 
   // SEND DATA TO FIREBASE
-  if (Firebase.ready() && signupOK)
+  if (startTime - sendDataPrevMillis > 500)
   {
-    // sendDataPrevMillis = millis();
-    // firebaseSetString(timeFirebaseDirectory, timeDisplay);
     firebaseSetFloat(speedFirebaseDirectory, speed);
-    // firebaseSetInt(rpmTestDirectory, rpm);
-    firebaseSetFloat(distanceFirebaseDirectory, distance);
-    firebaseSetFloat(averageSpeedFirebaseDirectory, averageSpeed);
     firebaseSetFloat(maxSpeedFirebaseDirectory, maxSpeed);
+    sendDataPrevMillis = startTime;
+  }
+
+  if (startTime - sendDataPrevMillis2 > 4000)
+  {
+    firebaseSetFloat(distanceFirebaseDirectory, distance);
+    sendDataPrevMillis2 = startTime;
+  }
+  
+  if (startTime - sendDataPrevMillis3 > 8000)
+  {
+    firebaseSetFloat(averageSpeedFirebaseDirectory, averageSpeed);
+    sendDataPrevMillis3 = startTime;
   }
 }
 
@@ -340,15 +332,6 @@ void interruptFunction() // interrupt service routine
   revolutions++;
   elapsedTime = millis() - revolutionStartTime;
   revolutionStartTime = millis();
-}
-
-void timeCount()
-{
-  if (startTime - endTime > 1000)
-  {
-    currentTimeCount++;
-    endTime = millis();
-  }
 }
 
 void firebaseSetInt(String databaseDirectory, int value)
@@ -395,22 +378,14 @@ void firebaseSetString(String databaseDirectory, String value)
 
 float firebaseGetFloat(String databaseDirectory)
 {
-  if (Firebase.RTDB.getString(&fbdo, databaseDirectory))
+  if (Firebase.RTDB.getFloat(&fbdo, databaseDirectory))
   {
-    char convertToChar[10];
-    String stringValue = fbdo.stringData();
-
-    // CONVERT STRING TO CHAR ARRAY
-    stringValue.toCharArray(convertToChar, stringValue.length() - 1);
-
-    convertToChar[0] = '0';
-    convertToChar[1] = '0';
-
-    // CONVERT CHAR TO FLOAT NUMBER
-    return atof(convertToChar);
+    float floatValue = fbdo.floatData();
+    return floatValue;
   }
   else
   {
     Serial.println(fbdo.errorReason());
+    return 0;
   }
 }
