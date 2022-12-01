@@ -1,0 +1,68 @@
+  // convert to string
+  String outMsg = String("RPM :") + rpm;
+  String speedMsg = String("SPEED :") + speed;
+  String timeMsg = String("time :") + elapsedTime;
+  String disMsg = String("distance :") + distance;
+  String avgMsg = String("averageSpeed :") + averageSpeed;
+  String rpmString = String(rpm);      // Create a character array of 10 characters
+  String speedString = String(speed);  // Create a character array of 10 characters
+  String disString = String(distance); // Create a character array of 10 characters
+  // Convert float to a string:
+  // dtostrf(rpm, 6, 0, string); // (<variable>,<amount of digits we are going to use>,<amount of decimal digits>,<string name>)
+
+  // OUTPUT to serial
+  Serial.println(outMsg);
+  Serial.println(speedMsg);
+  Serial.println(timeMsg);
+  Serial.println(disMsg);
+  Serial.println(currentRevolution);
+  Serial.println(timeDisplay);
+  Serial.println(avgMsg);
+  Serial.println(currentTimeCount);
+
+  // void timeCount()
+// {
+//   if (endTime - startTime > 1000)
+//   {
+//     if (timeSeconds < 60)
+//     {
+//       if (timeSeconds < 10)
+//       {
+//         timeDisplay = String("0") + timeHours + String(" : ") + String("0") + timeMinutes + String(" : ") + String("0") + timeSeconds;
+//       }
+//       else
+//         timeDisplay = String("0") + timeHours + String(" : ") + String("0") + timeMinutes + String(" : ") + timeSeconds;
+
+//       timeSeconds++;
+//     }
+//     else if (timeMinutes < 60)
+//     {
+//       timeSeconds = 0;
+//       timeMinutes++;
+//       if (timeMinutes < 10)
+//       {
+//         timeDisplay = String("0") + timeHours + String(" : ") + String("0") + timeMinutes + String(" : ") + String("0") + timeSeconds;
+//       }
+//       else
+//         timeDisplay = String("0") + timeHours + String(" : ") + timeMinutes + String(" : ") + String("0") + timeSeconds;
+//       timeSeconds++;
+//     }
+//     else if (timeHours < 24)
+//     {
+//       timeSeconds = 0;
+//       timeMinutes = 0;
+//       timeHours++;
+//       if (timeHours < 10)
+//       {
+//         timeDisplay = String("0") + timeHours + String(" : ") + String("0") + timeMinutes + String(" : ") + String("0") + timeSeconds;
+//       }
+//       else
+//         timeDisplay = timeHours + String(" : ") + timeMinutes + String(" : ") + String("0") + timeSeconds;
+//       timeSeconds++;
+//       timeMinutes++;
+//     }
+
+//     currentTimeCount++;
+//     startTime = millis();
+//   }
+// }
