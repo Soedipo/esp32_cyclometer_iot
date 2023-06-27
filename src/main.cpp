@@ -20,12 +20,12 @@ Adafruit_SSD1306 display(128, 64);
 
 #define HALL 2
 #define LED LED_BUILTIN
-#define DATABASE_URL "https://iot-tubes-cyclometer-27152-default-rtdb.firebaseio.com/"
-#define API_KEY "AIzaSyA_2kq4DiwnodMRIzicpIpSUwo45-GP1GA"
+#define DATABASE_URL "myurl"
+#define API_KEY "myapi"
 
 // Insert your network credentials
-#define WIFI_SSID "Galaxy A50s527"
-#define WIFI_PASSWORD "yorw9305"
+#define WIFI_SSID "mywifi"
+#define WIFI_PASSWORD "mypass"
 
 void interruptFunction();
 void startCycling();
